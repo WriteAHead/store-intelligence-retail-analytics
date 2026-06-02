@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-import os
 
 st.set_page_config(
     page_title="Store Intelligence Dashboard",
@@ -21,24 +20,15 @@ st.divider()
 
 st.subheader("Processed CCTV Feed")
 
-VIDEO_PATH = "tracked_output_web.mp4"
+st.info(
+    """
+    Processed CCTV footage was used to generate the analytics shown below.
 
-if os.path.exists(VIDEO_PATH):
-
-    video_file = open(
-        VIDEO_PATH,
-        "rb"
-    )
-
-    video_bytes = video_file.read()
-
-    st.video(video_bytes)
-
-else:
-
-    st.error(
-        f"Video not found: {VIDEO_PATH}"
-    )
+    Due to deployment size limitations, the demo video is included in the
+    project repository and submission package instead of being streamed
+    through the cloud dashboard.
+    """
+)
 
 st.divider()
 
@@ -107,9 +97,7 @@ funnel_df = pd.DataFrame(
 )
 
 st.bar_chart(
-    funnel_df,
-    x="Stage",
-    y="Count"
+    funnel_df.set_index("Stage")
 )
 
 st.divider()
