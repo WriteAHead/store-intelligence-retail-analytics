@@ -1,3 +1,6 @@
+```python
+import os
+import requests
 import streamlit as st
 import pandas as pd
 
@@ -20,15 +23,108 @@ st.divider()
 
 st.subheader("Processed CCTV Feed")
 
-st.info(
+st.warning(
     """
-    Processed CCTV footage was used to generate the analytics shown below.
+    **The processed CCTV video is being downloaded from cloud storage.**
 
-    Due to deployment size limitations, the demo video is included in the
-    project repository and submission package instead of being streamed
-    through the cloud dashboard.
+    **Please be patient for a few minutes.**
+
+    Download time depends on:
+    - Internet speed
+    - Streamlit Cloud server load
+    - Video size
+
+    Once the download completes, the video player will automatically appear below.
     """
 )
+
+FILE_ID = "1q51nhQ3J80MAr7cOcva66ZTAUMghabIB"
+
+VIDEO_URL = (
+    f"https://drive.google.com/uc?export=download&id={FILE_ID}"
+)
+
+VIDEO_PATH = "tracked_output_web.mp4"
+
+if not os.path.exists(VIDEO_PATH):
+
+    try:
+
+        st.info(
+            "Downloading processed CCTV video..."
+        )
+
+        response = requests.get(
+            VIDEO_URL,
+            stream=True,
+            timeout=600
+        )
+
+        total_size = int(
+            response.headers.get(
+                "content-length",
+                0
+            )
+        )
+
+        progress_bar = st.progress(0)
+
+        status_text = st.empty()
+
+        downloaded = 0
+
+        with open(VIDEO_PATH, "wb") as file:
+
+            for chunk in response.iter_content(
+                chunk_size=1024 * 1024
+            ):
+
+                if chunk:
+
+                    file.write(chunk)
+
+                    downloaded += len(chunk)
+
+                    if total_size > 0:
+
+                        percentage = int(
+                            downloaded * 100 / total_size
+                        )
+
+                        progress_bar.progress(
+                            min(
+                                percentage,
+                                100
+                            )
+                        )
+
+                        status_text.text(
+                            f"Download Progress: {percentage}%"
+                        )
+
+        progress_bar.empty()
+
+        status_text.empty()
+
+        st.success(
+            "Video downloaded successfully."
+        )
+
+    except Exception as e:
+
+        st.error(
+            f"Video download failed: {e}"
+        )
+
+if os.path.exists(VIDEO_PATH):
+
+    st.video(VIDEO_PATH)
+
+else:
+
+    st.warning(
+        "Video is not available yet."
+    )
 
 st.divider()
 
@@ -145,3 +241,4 @@ st.divider()
 st.caption(
     "Store Intelligence Platform | YOLOv8 | Tracking | Event Analytics"
 )
+```
