@@ -1,4 +1,3 @@
-```python
 import os
 import requests
 import streamlit as st
@@ -241,4 +240,3 @@ st.divider()
 st.caption(
     "Store Intelligence Platform | YOLOv8 | Tracking | Event Analytics"
 )
-```
